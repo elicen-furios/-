@@ -1,0 +1,661 @@
+"use client";
+
+import { useState } from "react";
+
+const agents = [
+  "Frontend Developer",
+  "Backend Architect",
+  "DevOps Engineer",
+  "Security Engineer",
+  "QA Engineer",
+  "UI Designer",
+  "UX Designer",
+  "Motion Designer",
+  "Product Manager",
+  "Product Analyst",
+  "Content Strategist",
+  "SEO Specialist",
+  "Social Media Manager",
+  "Sales Strategist",
+  "Outreach Specialist",
+  "Researcher",
+  "Fact Checker"
+];
+
+export default function Home() {
+  const [agent, setAgent] = useState("Frontend Developer");
+  const [message, setMessage] = useState("");
+  const [context, setContext] = useState("");
+  const [answer, setAnswer] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function runAgent() {
+    if (!message.trim() || loading) return;
+
+    setLoading(true);
+    setAnswer("");
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          agent,
+          message,
+          context
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Request failed");
+      }
+
+      setAnswer(data.answer);
+    } catch (error) {
+      setAnswer(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <main className="app">
+
+      <aside className="sidebar">
+
+        <div className="logo">
+          <div className="logo-icon">A</div>
+
+          <div>
+            <h2>THE AGENCY</h2>
+            <span>AI WORKFORCE</span>
+          </div>
+        </div>
+
+        <div className="section-title">
+          SPECIALISTS
+        </div>
+
+        {agents.map((item) => (
+          <button
+            key={item}
+            className={
+              agent === item
+                ? "agent active"
+                : "agent"
+            }
+            onClick={() => {
+              setAgent(item);
+              setAnswer("");
+            }}
+          >
+            <span>✦</span>
+            {item}
+          </button>
+        ))}
+
+      </aside>
+
+
+      <section className="main">
+
+        <header className="topbar">
+
+          <div>
+            <small>ACTIVE SPECIALIST</small>
+            <strong>{agent}</strong>
+          </div>
+
+          <div className="online">
+            <i></i>
+            {loading ? "WORKING" : "ONLINE"}
+          </div>
+
+        </header>
+
+
+        <div className="content">
+
+          <section className="hero">
+
+            <div className="badge">
+              ✦ AI SPECIALIST WORKSPACE
+            </div>
+
+            <h1>
+              Build with your
+              <br />
+              <span>AI workforce.</span>
+            </h1>
+
+            <p>
+              Choose a specialist, describe your task,
+              and let The Agency help you.
+            </p>
+
+          </section>
+
+
+          <section className="card">
+
+            <label>
+              PROJECT CONTEXT
+            </label>
+
+            <textarea
+              value={context}
+              onChange={(e) =>
+                setContext(e.target.value)
+              }
+              placeholder="Tell the agent about your project..."
+            />
+
+          </section>
+
+
+          <section className="chat">
+
+            {!answer && !loading && (
+              <div className="empty">
+
+                <div className="orb">
+                  ✦
+                </div>
+
+                <h2>
+                  What should we work on?
+                </h2>
+
+                <p>
+                  You are working with{" "}
+                  <b>{agent}</b>
+                </p>
+
+              </div>
+            )}
+
+
+            {loading && (
+              <div className="empty">
+
+                <div className="orb loading">
+                  ✦
+                </div>
+
+                <h2>
+                  {agent} is thinking...
+                </h2>
+
+                <p>
+                  The Agency is processing your task.
+                </p>
+
+              </div>
+            )}
+
+
+            {answer && !loading && (
+              <div className="answer">
+
+                <div className="answer-top">
+
+                  <div>
+                    <small>AGENCY SPECIALIST</small>
+                    <h3>{agent}</h3>
+                  </div>
+
+                  <button
+                    onClick={() =>
+                      navigator.clipboard.writeText(answer)
+                    }
+                  >
+                    COPY
+                  </button>
+
+                </div>
+
+                <div className="answer-text">
+                  {answer}
+                </div>
+
+              </div>
+            )}
+
+          </section>
+
+
+          <section className="composer">
+
+            <textarea
+              value={message}
+              onChange={(e) =>
+                setMessage(e.target.value)
+              }
+              placeholder={`Ask ${agent} anything...`}
+              onKeyDown={(e) => {
+
+                if (
+                  e.key === "Enter" &&
+                  !e.shiftKey
+                ) {
+                  e.preventDefault();
+                  runAgent();
+                }
+
+              }}
+            />
+
+            <button
+              onClick={runAgent}
+              disabled={
+                loading ||
+                !message.trim()
+              }
+            >
+              {loading
+                ? "WORKING..."
+                : "RUN AGENT →"}
+            </button>
+
+          </section>
+
+          <div className="hint">
+            Enter to run · Shift + Enter for new line
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <style jsx global>{`
+
+        * {
+          box-sizing: border-box;
+        }
+
+        html,
+        body {
+          margin: 0;
+          padding: 0;
+          background: #070709;
+          color: white;
+          font-family: Arial, sans-serif;
+        }
+
+        button,
+        textarea {
+          font: inherit;
+        }
+
+        .app {
+          min-height: 100vh;
+          display: flex;
+          background:
+            radial-gradient(
+              circle at 70% 10%,
+              #1d1d22 0,
+              #070709 35%
+            );
+        }
+
+        .sidebar {
+          width: 280px;
+          min-height: 100vh;
+          padding: 25px 15px;
+          background: #0d0d10;
+          border-right: 1px solid #252529;
+          overflow-y: auto;
+        }
+
+        .logo {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 5px 10px 30px;
+        }
+
+        .logo-icon {
+          width: 40px;
+          height: 40px;
+          border: 1px solid #444;
+          border-radius: 11px;
+          display: grid;
+          place-items: center;
+          font-weight: 900;
+          background: #1b1b1f;
+        }
+
+        .logo h2 {
+          margin: 0;
+          font-size: 14px;
+          letter-spacing: 1px;
+        }
+
+        .logo span {
+          font-size: 8px;
+          color: #666;
+          letter-spacing: 2px;
+        }
+
+        .section-title {
+          color: #55555b;
+          font-size: 9px;
+          letter-spacing: 2px;
+          padding: 0 10px 12px;
+        }
+
+        .agent {
+          width: 100%;
+          border: 0;
+          background: transparent;
+          color: #85858c;
+          padding: 10px;
+          border-radius: 8px;
+          text-align: left;
+          cursor: pointer;
+          display: flex;
+          gap: 10px;
+          align-items: center;
+          font-size: 12px;
+          margin-bottom: 3px;
+        }
+
+        .agent:hover {
+          background: #19191d;
+          color: white;
+        }
+
+        .agent.active {
+          background: #28282d;
+          color: white;
+        }
+
+        .main {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .topbar {
+          height: 72px;
+          padding: 0 35px;
+          border-bottom: 1px solid #242428;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .topbar small {
+          display: block;
+          color: #55555b;
+          font-size: 8px;
+          letter-spacing: 2px;
+        }
+
+        .topbar strong {
+          display: block;
+          font-size: 13px;
+          margin-top: 4px;
+        }
+
+        .online {
+          border: 1px solid #303035;
+          border-radius: 20px;
+          padding: 7px 11px;
+          color: #888;
+          font-size: 8px;
+          letter-spacing: 1px;
+        }
+
+        .online i {
+          display: inline-block;
+          width: 5px;
+          height: 5px;
+          background: #aaa;
+          border-radius: 50%;
+          margin-right: 6px;
+        }
+
+        .content {
+          max-width: 1050px;
+          margin: auto;
+          padding: 65px 35px;
+        }
+
+        .badge {
+          color: #777;
+          font-size: 9px;
+          letter-spacing: 2px;
+          margin-bottom: 18px;
+        }
+
+        .hero h1 {
+          margin: 0;
+          font-size: clamp(45px, 7vw, 75px);
+          line-height: .98;
+          letter-spacing: -3px;
+        }
+
+        .hero h1 span {
+          color: #777;
+        }
+
+        .hero p {
+          color: #707078;
+          font-size: 13px;
+          line-height: 1.7;
+          max-width: 550px;
+          margin: 20px 0 35px;
+        }
+
+        .card,
+        .chat {
+          background: #101013;
+          border: 1px solid #27272c;
+          border-radius: 14px;
+        }
+
+        .card {
+          padding: 16px;
+          margin-bottom: 13px;
+        }
+
+        label {
+          display: block;
+          color: #5c5c63;
+          font-size: 8px;
+          letter-spacing: 2px;
+          margin-bottom: 9px;
+        }
+
+        textarea {
+          width: 100%;
+          border: 0;
+          outline: 0;
+          resize: none;
+          background: transparent;
+          color: #ddd;
+          line-height: 1.6;
+        }
+
+        .card textarea {
+          height: 55px;
+        }
+
+        .chat {
+          min-height: 360px;
+          padding: 25px;
+          margin-bottom: 13px;
+        }
+
+        .empty {
+          min-height: 305px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          text-align: center;
+        }
+
+        .orb {
+          width: 58px;
+          height: 58px;
+          border-radius: 50%;
+          border: 1px solid #3b3b40;
+          background: #18181c;
+          display: grid;
+          place-items: center;
+          margin-bottom: 18px;
+          box-shadow:
+            0 0 50px rgba(255,255,255,.06);
+        }
+
+        .orb.loading {
+          animation: pulse 1.2s infinite alternate;
+        }
+
+        @keyframes pulse {
+          from {
+            opacity: .3;
+            transform: scale(.95);
+          }
+
+          to {
+            opacity: 1;
+            transform: scale(1.05);
+          }
+        }
+
+        .empty h2 {
+          font-size: 19px;
+          margin: 0 0 7px;
+        }
+
+        .empty p {
+          color: #606067;
+          font-size: 12px;
+          margin: 0;
+        }
+
+        .answer {
+          max-width: 850px;
+          margin: auto;
+        }
+
+        .answer-top {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-bottom: 1px solid #29292d;
+          padding-bottom: 16px;
+          margin-bottom: 20px;
+        }
+
+        .answer-top small {
+          color: #55555b;
+          font-size: 8px;
+          letter-spacing: 2px;
+        }
+
+        .answer-top h3 {
+          margin: 5px 0 0;
+          font-size: 13px;
+        }
+
+        .answer-top button {
+          background: #202024;
+          color: #aaa;
+          border: 1px solid #333;
+          border-radius: 7px;
+          padding: 7px 10px;
+          cursor: pointer;
+          font-size: 8px;
+        }
+
+        .answer-text {
+          color: #ccc;
+          white-space: pre-wrap;
+          line-height: 1.75;
+          font-size: 13px;
+        }
+
+        .composer {
+          display: flex;
+          gap: 10px;
+          padding: 12px;
+          border: 1px solid #303035;
+          border-radius: 14px;
+          background: #101013;
+        }
+
+        .composer textarea {
+          min-height: 55px;
+          padding: 8px;
+        }
+
+        .composer button {
+          align-self: flex-end;
+          border: 0;
+          border-radius: 9px;
+          background: white;
+          color: black;
+          padding: 12px 16px;
+          cursor: pointer;
+          font-weight: bold;
+          font-size: 10px;
+          white-space: nowrap;
+        }
+
+        .composer button:disabled {
+          opacity: .35;
+          cursor: not-allowed;
+        }
+
+        .hint {
+          color: #44444a;
+          font-size: 8px;
+          text-align: right;
+          margin-top: 8px;
+        }
+
+        @media(max-width: 750px) {
+
+          .sidebar {
+            width: 220px;
+          }
+
+          .content {
+            padding: 40px 18px;
+          }
+
+          .topbar {
+            padding: 0 18px;
+          }
+
+          .hero h1 {
+            font-size: 45px;
+          }
+
+          .composer {
+            flex-direction: column;
+          }
+
+          .composer button {
+            width: 100%;
+          }
+
+        }
+
+      `}</style>
+
+    </main>
+  );
+}
