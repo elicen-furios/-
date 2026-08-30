@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elicen API Vault</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="logo">
+    <img src="image.png" alt="Logo">
+    <div>
+      <strong>Elicen</strong>
+      <small>API VAULT</small>
+    </div>
+  </div>
+
+  <div class="searchBox">
+    <span>⌕</span>
+    <input id="searchInput"
+           type="text"
+           placeholder="Search APIs, categories or keywords...">
+  </div>
+
+  <div class="topActions">
+    <button id="themeBtn">◐</button>
+    <button id="musicBtn">♫</button>
+    <a href="developer.html">Developer</a>
+  </div>
+</header>
+
+<audio id="music" src="music.mp3" loop></audio>
+
+<div class="layout">
+
+  <aside id="sidebar">
+
+    <div class="developerMini">
+      <img src="image2.png" alt="Developer">
+      <div>
+        <b>Elicen</b>
+        <small>Developer</small>
+      </div>
+    </div>
+
+    <div class="sideTitle">DIRECTORY</div>
+
+    <button class="sideBtn active" data-view="all">
+      All APIs
+      <span id="allCount">0</span>
+    </button>
+
+    <button class="sideBtn" data-view="favorites">
+      Favorites
+      <span id="favCount">0</span>
+    </button>
+
+    <button class="sideBtn" data-view="recent">
+      Recently Viewed
+      <span id="recentCount">0</span>
+    </button>
+
+    <div class="sideTitle">CATEGORIES</div>
+
+    <div id="categories"></div>
+
+    <div class="sideBottom">
+      <a href="developer.html">Developer</a>
+
+      <a target="_blank"
+         href="https://www.instagram.com/elicen_furios?igsi=d3NiNTMwZGFuMnZj">
+        Instagram
+      </a>
+    </div>
+
+  </aside>
+
+  <main>
+
+    <button class="mobileMenu" id="menuBtn">☰</button>
+
+    <section class="hero">
+
+      <div class="heroText">
+
+        <div class="eyebrow">FREE PUBLIC API DIRECTORY</div>
+
+        <h1>
+          Find the API.<br>
+          <span>Build the idea.</span>
+        </h1>
+
+        <p>
+          Browse thousands of public APIs by category.
+          Search instantly, inspect API information and test
+          browser-accessible endpoints.
+        </p>
+
+        <button id="exploreBtn" class="primaryBtn">
+          Explore APIs →
+        </button>
+
+      </div>
+
+      <div class="terminal">
+
+        <div class="terminalTop">
+          <i></i><i></i><i></i>
+          <span>api-tester</span>
+        </div>
+
+        <pre>
+<b>GET</b> /api/endpoint
+
+<span class="success">200 OK</span>
+
+{
+  "status": "ready",
+  "results": 18
+}
+        </pre>
+
+      </div>
+
+    </section>
+
+    <section class="stats">
+
+      <div>
+        <strong id="totalApis">0</strong>
+        <small>Total APIs</small>
+      </div>
+
+      <div>
+        <strong id="totalCategories">0</strong>
+        <small>Categories</small>
+      </div>
+
+      <div>
+        <strong id="httpsApis">0</strong>
+        <small>HTTPS APIs</small>
+      </div>
+
+      <div>
+        <strong id="noAuthApis">0</strong>
+        <small>No Authentication</small>
+      </div>
+
+    </section>
+
+    <section id="directory">
+
+      <div class="sectionHeader">
+
+        <div>
+          <div class="eyebrow">DISCOVER</div>
+          <h2 id="sectionTitle">All APIs</h2>
+          <p id="resultText">Loading...</p>
+        </div>
+
+        <div class="filters">
+
+          <button class="filter active" data-filter="all">
+            All
+          </button>
+
+          <button class="filter" data-filter="noauth">
+            No Auth
+          </button>
+
+          <button class="filter" data-filter="https">
+            HTTPS
+          </button>
+
+          <button class="filter" data-filter="cors">
+            CORS
+          </button>
+
+        </div>
+
+      </div>
+
+      <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <h3>Loading public APIs...</h3>
+        <p>Fetching data from GitHub.</p>
+      </div>
+
+      <div id="apiGrid"></div>
+
+      <div id="pagination"></div>
+
+    </section>
+
+    <footer>
+      <strong>Elicen API Vault</strong>
+      <span>Powered by public-apis</span>
+      <a href="developer.html">Developer</a>
+    </footer>
+
+  </main>
+
+</div>
+
+
+<!-- API POPUP -->
+
+<div id="modal" class="modalOverlay">
+
+  <div class="modal">
+
+    <button id="closeModal" class="closeBtn">
+      ×
+    </button>
+
+    <div class="modalHeader">
+
+      <img src="image.png">
+
+      <div>
+        <small id="modalCategory"></small>
+        <h2 id="modalName"></h2>
+      </div>
+
+    </div>
+
+    <p id="modalDescription"></p>
+
+    <div id="modalDetails" class="details"></div>
+
+    <div class="apiUrl">
+      <span id="modalUrl"></span>
+      <button id="copyBtn">Copy</button>
+    </div>
+
+    <div class="modalActions">
+
+      <a id="visitBtn"
+         target="_blank"
+         class="primaryBtn">
+        Visit API ↗
+      </a>
+
+      <button id="favBtn" class="secondaryBtn">
+        Favorite
+      </button>
+
+      <button id="testerBtn" class="secondaryBtn">
+        API Tester
+      </button>
+
+    </div>
+
+
+    <!-- API TESTER -->
+
+    <div id="tester" class="tester">
+
+      <h3>API Tester</h3>
+
+      <p>
+        Test a GET endpoint directly from your browser.
+      </p>
+
+      <div class="requestBox">
+
+        <select>
+          <option>GET</option>
+        </select>
+
+        <input id="testUrl">
+
+        <button id="sendBtn" class="primaryBtn">
+          Send Request
+        </button>
+
+      </div>
+
+      <pre id="responseBox">Ready.</pre>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
